@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
@@ -36,7 +35,21 @@ namespace EventBot {
             config = FromYaml<Config>(yaml);
             return true;
         }
-        
+
+        public static Configuration LoadConfiguration() {
+            Configuration config = FromYaml<Configuration>(System.IO.File.ReadAllText("config.yml"));
+            Configuration creds = FromYaml<Configuration>(System.IO.File.ReadAllText("credentials.yml"));
+
+            config.client.token = creds.client.token;
+            Action<DriverConfig, DriverConfig> mapConfigs = (from, to) => {
+                foreach ((string? key, string? value) in from.driverOptions)
+                    to.driverOptions[key] = value;
+            };
+            mapConfigs(creds.database, config.database);
+            mapConfigs(creds.mail, config.mail);
+
+            return config;
+        }
         
         public static string ToYaml(object obj) {
             ISerializer s = new SerializerBuilder().WithNamingConvention(UnderscoredNamingConvention.Instance).Build();

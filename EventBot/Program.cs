@@ -29,10 +29,6 @@ namespace EventBot {
             return Task.CompletedTask;
         }
 
-        private static Configuration LoadConfig() {
-            return Configuration.FromYaml<Configuration>(System.IO.File.ReadAllText("config.yml"));
-        }
-
         private void SetupDatabaseService(Configuration.DriverConfig dbConfig) {
             IDatabaseDriver driver;
             switch (dbConfig.driver.ToLower()) {
@@ -74,7 +70,7 @@ namespace EventBot {
         private ModuleHost moduleHost;
 
         public async Task MainAsync() {
-            Configuration cfg = LoadConfig();
+            Configuration cfg = Configuration.LoadConfiguration();
             InitialiseServices();
             SetupDatabaseService(cfg.database);
             SetupMailService(cfg.mail);

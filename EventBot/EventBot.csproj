@@ -20,6 +20,10 @@
       <Content Include="config.yml">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
+      <None Remove="credentials.yml" />
+      <Content Include="credentials.yml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
 
 </Project>
