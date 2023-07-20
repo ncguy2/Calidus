@@ -1,0 +1,23 @@
+client:
+  token: 
+  display_name: Calidus
+database:
+  driver: mysql
+  driver_options:
+    server: nfs.pve.local
+    user: u42_lxyE1ZWUq1
+    password: 
+    database: s42_calidus-dev
+mail:
+  driver: smtp
+  driver_options:
+    host: smtp-mail.outlook.com
+    username: pterodactyl-nick.guy@outlook.com
+    password: 
+    enable_ssl: true
+modules:
+  - name: event
+    enabled: true
+    role_format: "%_format"
+    send_emails: true
+    manage_roles: true
