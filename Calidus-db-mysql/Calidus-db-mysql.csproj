@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <RootNamespace>Calidus_db_mysql</RootNamespace>
+    </PropertyGroup>
+
+
+    <ItemGroup>
+      <ProjectReference Include="..\Calidus-lib\Calidus-lib.csproj" />
+    </ItemGroup>
+
+
+    <ItemGroup>
+      <PackageReference Include="MySql.Data" Version="8.0.33" />
+    </ItemGroup>
+
+</Project>
