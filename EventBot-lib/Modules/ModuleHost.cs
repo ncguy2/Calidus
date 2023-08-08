@@ -1,23 +1,48 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace EventBot.lib.Modules {
     public class ModuleHost {
-        private List<dynamic> modules = new();
+        private List<IModule> modules = new();
 
-        public delegate void OnRegister(object module);
+        public IReadOnlyList<IModule> Modules => modules.AsReadOnly();
+
+        public delegate void OnRegister(IModule module);
 
         public event OnRegister OnModuleRegister;
 
-        public void RegisterModules() {
-            RegisterModule<EventModule, EventModuleConfig>();
+        public ModuleHost() {
+            OnModuleRegister += module => {
+                if (module is ISupervisorModule supervisorModule)
+                    supervisorModule.ModuleHost = this;
+            };
         }
 
-        private void RegisterModule<T, CFG>() where T : IModule<CFG>, new() where CFG : IModuleConfig {
+        public void RegisterModules() {
+            Assembly asm = Assembly.GetExecutingAssembly();
+            IEnumerable<Type> moduleTypes = asm.GetTypes().Where(x => Attribute.IsDefined(x, typeof(ModuleAttribute)));
+            foreach (Type moduleType in moduleTypes) {
+                ModuleAttribute? mAttr = moduleType.GetCustomAttribute<ModuleAttribute>();
+                RegisterModuleByRuntimeType(moduleType, mAttr.ConfigType);
+            }
+        }
+
+        private void RegisterModuleByRuntimeType(Type moduleType, Type configType) {
+            MethodInfo? method = typeof(ModuleHost).GetMethod(nameof(RegisterModuleByType), BindingFlags.NonPublic | BindingFlags.Instance);
+            MethodInfo generic = method.MakeGenericMethod(moduleType, configType);
+            generic.Invoke(this, null);
+        }
+
+        private void RegisterModuleByType<T, CFG>() where T : IModule<CFG>, new() where CFG : IModuleConfig {
             T module = new();
+            RegisterModule(module);
+        }
+
+        private void RegisterModule<CFG>(IModule<CFG> module) where CFG : IModuleConfig {
             modules.Add(module);
-            InjectModuleName<T, CFG>(module);
+            InjectModuleName(module);
             OnModuleRegister(module);
         }
 
@@ -26,8 +51,8 @@ namespace EventBot.lib.Modules {
                 module.Bootstrap(cfg);
         }
         
-        private void InjectModuleName<T, CFG>(T module) where T : IModule<CFG>, new() where CFG : IModuleConfig {
-            ModuleAttribute? moduleAttr = typeof(T).GetCustomAttribute<ModuleAttribute>();
+        private void InjectModuleName<CFG>(IModule<CFG> module) where CFG : IModuleConfig {
+            ModuleAttribute? moduleAttr = module.GetType().GetCustomAttribute<ModuleAttribute>();
             if (moduleAttr == null)
                 return;
 

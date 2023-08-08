@@ -1,6 +1,6 @@
 client:
   token: 
-  display_name: Calidus
+  display_name: Calidus-dev
 database:
   driver: mysql
   driver_options:
@@ -18,6 +18,8 @@ mail:
 modules:
   - name: event
     enabled: true
-    role_format: "%_format"
+    role_format: "event_%"
     send_emails: true
     manage_roles: true
+  - name: help
+    enabled: true

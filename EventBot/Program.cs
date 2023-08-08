@@ -7,12 +7,8 @@ using Discord.WebSocket;
 using EventBot.db.mysql.Data.Drivers;
 using EventBot.lib.Data;
 using EventBot.lib.Defer;
-using EventBot.lib.Event;
-using EventBot.lib.Event.Interactions;
 using EventBot.lib.Mail;
 using EventBot.lib.Modules;
-using YamlDotNet.Serialization;
-using YamlDotNet.Serialization.NamingConventions;
 
 namespace EventBot {
     class Program {
@@ -68,7 +64,13 @@ namespace EventBot {
         }
 
         private ModuleHost moduleHost;
+        private Dictionary<string, Action<SocketSlashCommand>> commandCallbacks = new();
 
+        private async Task SlashCommandHandler(SocketSlashCommand cmd) {
+            if (commandCallbacks.ContainsKey(cmd.Data.Name)) 
+                commandCallbacks[cmd.Data.Name].Invoke(cmd);
+        }
+        
         public async Task MainAsync() {
             Configuration cfg = Configuration.LoadConfiguration();
             InitialiseServices();
@@ -76,27 +78,50 @@ namespace EventBot {
             SetupMailService(cfg.mail);
 
             moduleHost = new ModuleHost();
+            moduleHost.OnModuleRegister += module => { Log("Module '" + module.Name + "' registered"); };
             moduleHost.OnModuleRegister += module => {
+                // ReSharper disable ConvertIfStatementToSwitchStatement
+                // ReSharper disable InvertIf
+
                 if (module is IModuleWithDiscordClient clientModule)
                     clientModule.Discord = client;
+
+                if (module is ISlashCommandProviderModule cmdProviderModule) {
+                    SlashCommandData[] buildSlashCommands = cmdProviderModule.BuildSlashCommands();
+                    if (buildSlashCommands.Length == 0)
+                        return;
+                    
+                    foreach (SlashCommandData cmd in buildSlashCommands) {
+                        if (commandCallbacks.ContainsKey(cmd.Properties.Name.Value))
+                            throw new Exception($"Duplicate command name \"{cmd.Properties.Name}\" provided by {module.Name}");
+                        commandCallbacks.Add(cmd.Properties.Name.Value, cmd.Callback);
+                    }
+
+                    foreach (SocketGuild guild in client.Guilds)
+                        guild.BulkOverwriteApplicationCommandAsync(
+                            buildSlashCommands.Select(x => x.Properties).Cast<ApplicationCommandProperties>()
+                                              .ToArray());
+                }
+
+                // ReSharper restore ConvertIfStatementToSwitchStatement
+                // ReSharper restore InvertIf
             };
-            
+
             DiscordSocketConfig discordConfig = new() {
                 GatewayIntents = GatewayIntents.AllUnprivileged | GatewayIntents.GuildMembers,
                 AlwaysDownloadUsers = true
             };
             client = new DiscordSocketClient(discordConfig);
             client.Log += Log;
+            client.SlashCommandExecuted += SlashCommandHandler;
             client.Ready += () => {
-                client.CurrentUser.ModifyAsync(user => {
-                    user.Username = cfg.client.displayName;
-                });
+                client.CurrentUser.ModifyAsync(user => { user.Username = cfg.client.displayName; });
                 DeferService.Get().setDiscordSocketClient(client);
                 moduleHost.RegisterModules();
                 moduleHost.StartModules(cfg);
                 return Log("Ready!");
             };
-            
+
             await client.LoginAsync(TokenType.Bot, cfg.client.token);
             await client.StartAsync();
 

@@ -69,7 +69,6 @@ namespace EventBot.lib.Event {
             user = evt.Guild.GetUser(user.Id);
             switch (user) {
                 case null:
-                    this.Log("User is null");
                     return;
                 case IGuildUser gUser when gUser.RoleIds.Contains(role.Id):
                     this.Log($"Removing role {role.Name} from {gUser.DisplayName}");
