@@ -2,9 +2,9 @@
 
 namespace EventBot.lib.Modules {
     public abstract class BaseModule<ModuleConfig> : IModule<ModuleConfig> where ModuleConfig : IModuleConfig, new() {
-        public string Name { get; set; }
-        
-        public ModuleConfig Config { get; private set; }
+        public string Name { get; set; } = null!;
+
+        public ModuleConfig Config { get; private set; } = default!;
 
         public bool Startup(ModuleConfig cfg) {
             Config = cfg;

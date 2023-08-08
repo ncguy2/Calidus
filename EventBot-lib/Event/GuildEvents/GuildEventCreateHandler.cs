@@ -32,6 +32,6 @@ namespace EventBot.lib.Event {
             await arg.Creator.AddRoleAsync(roleAsync);
         }
 
-        public EventModule OwningModule { get; set; }
+        public EventModule OwningModule { get; set; } = null!;
     }
 }

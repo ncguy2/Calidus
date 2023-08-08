@@ -11,7 +11,7 @@ namespace EventBot.lib.Mail {
         public static MailService Get() => _instance ??= new MailService();
         public static MailService Instance => Get();
 
-        private IMailDriver _driver;
+        private IMailDriver _driver = null!;
 
         public void setDriver(IMailDriver driver) {
             this._driver = driver;
@@ -37,7 +37,7 @@ namespace EventBot.lib.Mail {
             str.AppendLine($"DESCRIPTION:{evt.Description}");
             str.AppendLine($"X-ALT-DESC;FMTTYPE=text/html:{evt.Description}");
             str.AppendLine($"SUMMARY:{evt.Name}");
-            str.AppendLine($"ORGANIZER:MAILTO:{msg.From.Address}");
+            str.AppendLine($"ORGANIZER:MAILTO:{msg.From!.Address}");
 
             str.AppendLine($"ATTENDEE;CN=\"{msg.To[0].DisplayName}\";RSVP=TRUE:mailto:{msg.To[0].Address}");
 

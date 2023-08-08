@@ -24,6 +24,6 @@ namespace EventBot.lib.Event {
             await socketRole.DeleteAsync();
         }
 
-        public EventModule OwningModule { get; set; }
+        public EventModule OwningModule { get; set; } = null!;
     }
 }

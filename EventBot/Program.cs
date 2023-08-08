@@ -15,7 +15,7 @@ namespace EventBot {
     class Program {
         static Task Main(string[] args) => new Program().MainAsync(args);
 
-        private DiscordSocketClient client;
+        private DiscordSocketClient client = null!;
 
         private Task Log(string msg) {
             Console.WriteLine(msg);
@@ -64,13 +64,14 @@ namespace EventBot {
             MailService.Instance.setDriver(driver);
         }
 
-        private ModuleHost moduleHost;
+        private ModuleHost moduleHost = null!;
 
         private Dictionary<string, Action<SocketSlashCommand>> commandCallbacks = new();
 
-        private async Task SlashCommandHandler(SocketSlashCommand cmd) {
+        private Task SlashCommandHandler(SocketSlashCommand cmd) {
             if (commandCallbacks.ContainsKey(cmd.Data.Name)) 
                 commandCallbacks[cmd.Data.Name].Invoke(cmd);
+            return Task.CompletedTask;
         }
 
         public async Task MainAsync(string[] args) {

@@ -28,8 +28,6 @@ namespace EventBot.lib.Modules {
             return "Prints help for each module";
         }
 
-        public ModuleHost ModuleHost { get; set; }
-
         public SlashCommandData[] BuildSlashCommands() {
             return new[] {
                 new SlashCommandData {
@@ -62,5 +60,7 @@ namespace EventBot.lib.Modules {
 
             cmd.RespondAsync(sb.ToString(), ephemeral: true);
         }
+
+        public ModuleHost ModuleHost { get; set; } = null!;
     }
 }
