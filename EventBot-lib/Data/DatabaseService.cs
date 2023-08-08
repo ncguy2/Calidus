@@ -9,7 +9,7 @@ namespace EventBot.lib.Data {
 
         public delegate void OnInsert(Type type, object data);
 
-        public event OnInsert OnInsertEvent;
+        public event OnInsert OnInsertEvent = null!;
 
         public void RegisterOnInsertEvent<T>(Action<T> func) {
             OnInsertEvent += (type, data) => {
@@ -23,9 +23,9 @@ namespace EventBot.lib.Data {
         }
 
         public static DatabaseService Instance => Get();
-        private IDatabaseDriver driver;
+        private IDatabaseDriver driver = null!;
 
-        private DatabaseService() { }
+        private DatabaseService() {}
 
         public string GetCreateString<T>() {
             DBColumnAttribute[] fields = GetFields<T>();
@@ -43,7 +43,7 @@ namespace EventBot.lib.Data {
 
         public void Insert<T>(T item) where T : new() {
             driver.Insert(item);
-            OnInsertEvent?.Invoke(typeof(T), item);
+            OnInsertEvent?.Invoke(typeof(T), item!);
         }
 
         public void Delete<T>(T item) where T : new() {

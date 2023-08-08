@@ -109,6 +109,6 @@ namespace EventBot.lib.Event {
             MailService.Instance.sendEventIcsToUserEmail(userEmail, mailEvt);
         }
 
-        public EventModule OwningModule { get; set; }
+        public EventModule OwningModule { get; set; } = null!;
     }
 }

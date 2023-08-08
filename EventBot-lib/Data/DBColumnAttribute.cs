@@ -8,7 +8,7 @@ namespace EventBot.lib.Data {
         public readonly bool primaryKey;
         public readonly bool autoincrement;
 
-        public FieldInfo attachedField;
+        public FieldInfo? attachedField;
 
         public DBColumnAttribute(string name, DBColumnType type, bool primaryKey = false, bool autoincrement = false) {
             this.name = name;

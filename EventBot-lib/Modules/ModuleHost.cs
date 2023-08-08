@@ -24,13 +24,13 @@ namespace EventBot.lib.Modules {
             Assembly asm = Assembly.GetExecutingAssembly();
             IEnumerable<Type> moduleTypes = asm.GetTypes().Where(x => Attribute.IsDefined(x, typeof(ModuleAttribute)));
             foreach (Type moduleType in moduleTypes) {
-                ModuleAttribute? mAttr = moduleType.GetCustomAttribute<ModuleAttribute>();
+                ModuleAttribute mAttr = moduleType.GetCustomAttribute<ModuleAttribute>()!;
                 RegisterModuleByRuntimeType(moduleType, mAttr.ConfigType);
             }
         }
 
         private void RegisterModuleByRuntimeType(Type moduleType, Type configType) {
-            MethodInfo? method = typeof(ModuleHost).GetMethod(nameof(RegisterModuleByType), BindingFlags.NonPublic | BindingFlags.Instance);
+            MethodInfo method = typeof(ModuleHost).GetMethod(nameof(RegisterModuleByType), BindingFlags.NonPublic | BindingFlags.Instance)!;
             MethodInfo generic = method.MakeGenericMethod(moduleType, configType);
             generic.Invoke(this, null);
         }

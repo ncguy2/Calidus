@@ -34,7 +34,7 @@ namespace EventBot.lib.Modules {
         }
 
 
-        public DiscordSocketClient Discord { get; set; }
+        public DiscordSocketClient Discord { get; set; } = null!;
 
         public string FormatRole(string roleName) {
             string format = Config.RoleFormat.Replace("%", "{0}");

@@ -2,13 +2,23 @@
 using System.Collections.Generic;
 using System.Reflection;
 
+// This file plays with some weird behaviours, and thus throws a fair few warnings.
+// As long as care is taken when using this class, the warnings are nothing to worry about, so suppress them.
+
+#pragma warning disable CS8603 // Possible null reference return.
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
+// ReSharper disable RedundantAssignment
+// ReSharper disable HeapView.ObjectAllocation
+// ReSharper disable HeapView.PossibleBoxingAllocation
+
 namespace EventBot {
     public static class ReflectionUtils {
-        public static T OverlayObjects<T>(object baseline, object overlay) {
+        public static T OverlayObjects<T>(T baseline, T overlay) {
             return (T)OverlayObjectsDirect(baseline, overlay);
         }
 
-        public static object OverlayObjectsDirect(object? baseline, object? overlay) {
+        private static object OverlayObjectsDirect(object? baseline, object? overlay) {
             if (baseline == null && overlay == null)
                 return null!;
             

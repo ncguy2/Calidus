@@ -68,6 +68,6 @@ namespace EventBot.lib.Event.Interactions {
             await arg.DeleteOriginalResponseAsync();
         }
 
-        public EventModule OwningModule { get; set; }
+        public EventModule OwningModule { get; set; } = null!;
     }
 }

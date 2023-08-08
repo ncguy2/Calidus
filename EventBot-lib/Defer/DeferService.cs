@@ -18,8 +18,8 @@ namespace EventBot.lib.Defer {
         }
 
         public static DeferService Instance => Get();
-        private DatabaseFacade<QueuedIcs> icsQueue;
-        private DiscordSocketClient client;
+        private readonly DatabaseFacade<QueuedIcs> icsQueue;
+        private DiscordSocketClient? client;
 
         private DeferService() {
             icsQueue = new DatabaseFacade<QueuedIcs>();
@@ -48,9 +48,9 @@ namespace EventBot.lib.Defer {
         }
 
         public void handleQueuedIcs(UserEmail userEmail, QueuedIcs queuedIcs) {
-            SocketGuildEvent guildEvent = client.GetGuild(queuedIcs.guildId).GetEvent(queuedIcs.eventId);
+            SocketGuildEvent guildEvent = client!.GetGuild(queuedIcs.guildId).GetEvent(queuedIcs.eventId);
             MailService.MailEvent mailEvent = MailService.ConvertSocketGuildEventToMailEvent(guildEvent);
-            MailService.Instance.sendEventIcsToUserEmail(userEmail.email, mailEvent);
+            MailService.Instance.sendEventIcsToUserEmail(userEmail.email!, mailEvent);
             
             icsQueue.Delete(queuedIcs);
         }
