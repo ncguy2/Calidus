@@ -79,12 +79,13 @@ namespace Calidus {
             app.HelpOption();
             var configPath = app.Option("-d|--data <PATH>",
                                         "The path to find the config/data files required for runtime operation (defaults to '.')",
-                                        CommandOptionType.SingleOrNoValue);
+                                        CommandOptionType.SingleValue);
+            configPath.DefaultValue = null;
             app.OnExecuteAsync(_ => MainAsyncConfigured(configPath.Value()));
             await app.ExecuteAsync(args);
         }
         public async Task MainAsyncConfigured(string? configPath) {
-            Configuration cfg = Configuration.LoadConfiguration();
+            Configuration cfg = Configuration.LoadConfiguration(configPath);
             InitialiseServices();
             SetupDatabaseService(cfg.database);
             SetupMailService(cfg.mail);
