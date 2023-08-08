@@ -39,14 +39,6 @@ namespace EventBot {
             Configuration config = FromYaml<Configuration>(System.IO.File.ReadAllText("config.yml"));
             Configuration creds = FromYaml<Configuration>(System.IO.File.ReadAllText("credentials.yml"));
 
-            // config.client.token = creds.client.token;
-            // Action<DriverConfig, DriverConfig> mapConfigs = (from, to) => {
-            //     foreach ((string? key, string? value) in from.driverOptions)
-            //         to.driverOptions[key] = value;
-            // };
-            // mapConfigs(creds.database, config.database);
-            // mapConfigs(creds.mail, config.mail);
-
             Configuration loadConfiguration = ReflectionUtils.OverlayObjects<Configuration>(config, creds);
             return loadConfiguration;
         }
