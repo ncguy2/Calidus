@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net7.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <RootNamespace>Calidus</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Calidus-db-mysql\Calidus-db-mysql.csproj" />
+      <ProjectReference Include="..\Calidus-lib\Calidus-lib.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.0.2" />
+      <PackageReference Include="YamlDotNet" Version="13.1.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="config.yml" />
+      <Content Include="config.yml" Condition="'$(Configuration)' == 'Debug'">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <None Remove="credentials.yml" />
+      <Content Include="credentials.yml" Condition="'$(Configuration)' == 'Debug'">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+
+</Project>
