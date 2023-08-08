@@ -9,10 +9,11 @@ using EventBot.lib.Data;
 using EventBot.lib.Defer;
 using EventBot.lib.Mail;
 using EventBot.lib.Modules;
+using McMaster.Extensions.CommandLineUtils;
 
 namespace EventBot {
     class Program {
-        static Task Main(string[] args) => new Program().MainAsync();
+        static Task Main(string[] args) => new Program().MainAsync(args);
 
         private DiscordSocketClient client;
 
@@ -64,14 +65,24 @@ namespace EventBot {
         }
 
         private ModuleHost moduleHost;
+
         private Dictionary<string, Action<SocketSlashCommand>> commandCallbacks = new();
 
         private async Task SlashCommandHandler(SocketSlashCommand cmd) {
             if (commandCallbacks.ContainsKey(cmd.Data.Name)) 
                 commandCallbacks[cmd.Data.Name].Invoke(cmd);
         }
-        
-        public async Task MainAsync() {
+
+        public async Task MainAsync(string[] args) {
+            var app = new CommandLineApplication();
+            app.HelpOption();
+            var configPath = app.Option("-d|--data <PATH>",
+                                        "The path to find the config/data files required for runtime operation (defaults to '.')",
+                                        CommandOptionType.SingleOrNoValue);
+            app.OnExecuteAsync(_ => MainAsyncConfigured(configPath.Value()));
+            await app.ExecuteAsync(args);
+        }
+        public async Task MainAsyncConfigured(string? configPath) {
             Configuration cfg = Configuration.LoadConfiguration();
             InitialiseServices();
             SetupDatabaseService(cfg.database);

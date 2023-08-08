@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
@@ -35,9 +36,25 @@ namespace EventBot {
             return true;
         }
 
-        public static Configuration LoadConfiguration() {
-            Configuration config = FromYaml<Configuration>(System.IO.File.ReadAllText("config.yml"));
-            Configuration creds = FromYaml<Configuration>(System.IO.File.ReadAllText("credentials.yml"));
+        public static Configuration LoadConfiguration(string? configPath = null) {
+
+            string pathPrefix = "";
+            if (configPath != null) {
+                pathPrefix = configPath;
+                if (!pathPrefix.EndsWith("/"))
+                    pathPrefix += "/";
+            }
+
+            string configFile = pathPrefix + "config.yml";
+            string credsFile = pathPrefix + "credentials.yml";
+
+            if (!File.Exists(configFile))
+                throw new FileNotFoundException("Config file could not be found at " + configFile);
+            if (!File.Exists(credsFile))
+                throw new FileNotFoundException("Credentials file could not be found at " + credsFile);
+            
+            Configuration config = FromYaml<Configuration>(File.ReadAllText(configFile));
+            Configuration creds = FromYaml<Configuration>(File.ReadAllText(credsFile));
 
             Configuration loadConfiguration = ReflectionUtils.OverlayObjects<Configuration>(config, creds);
             return loadConfiguration;
