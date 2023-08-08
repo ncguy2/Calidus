@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
@@ -41,15 +39,16 @@ namespace EventBot {
             Configuration config = FromYaml<Configuration>(System.IO.File.ReadAllText("config.yml"));
             Configuration creds = FromYaml<Configuration>(System.IO.File.ReadAllText("credentials.yml"));
 
-            config.client.token = creds.client.token;
-            Action<DriverConfig, DriverConfig> mapConfigs = (from, to) => {
-                foreach ((string? key, string? value) in from.driverOptions)
-                    to.driverOptions[key] = value;
-            };
-            mapConfigs(creds.database, config.database);
-            mapConfigs(creds.mail, config.mail);
+            // config.client.token = creds.client.token;
+            // Action<DriverConfig, DriverConfig> mapConfigs = (from, to) => {
+            //     foreach ((string? key, string? value) in from.driverOptions)
+            //         to.driverOptions[key] = value;
+            // };
+            // mapConfigs(creds.database, config.database);
+            // mapConfigs(creds.mail, config.mail);
 
-            return config;
+            Configuration loadConfiguration = ReflectionUtils.OverlayObjects<Configuration>(config, creds);
+            return loadConfiguration;
         }
         
         public static string ToYaml(object obj) {

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using Discord;
 using Discord.WebSocket;
 using EventBot.Compose;
@@ -68,6 +67,5 @@ namespace EventBot.lib.Modules {
         public bool SendEmails { get; set; }
         public bool ManageRoles { get; set; }
         public string RoleFormat { get; set; }
-
     }
 }

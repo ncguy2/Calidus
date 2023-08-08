@@ -18,9 +18,7 @@ namespace EventBot.lib.Modules {
     public interface ISlashCommandProviderModule {
         SlashCommandData[] BuildSlashCommands();
     }
-
-
-
+    
     public struct SlashCommandData {
         public SlashCommandProperties Properties;
         public Action<SocketSlashCommand> Callback;
